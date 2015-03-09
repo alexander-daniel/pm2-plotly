@@ -1,8 +1,8 @@
 {
-    "username": "alexander.daniel",
-    "apiKey": "u1jactdk3m",
+    "username": "plotlyUsername",
+    "apiKey": "plotlyApiKey",
     "tokens": [
-        "ztjusdxavr",
-        "m0qcrz4sy7"
+        "exampleToken1",
+        "exampleToken2"
     ]
 }

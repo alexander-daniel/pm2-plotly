@@ -9,8 +9,19 @@ var http = require('http');
 var moment = require('moment');
 var request = require('request');
 
-var config = require('./config');
+var fs = require('fs');
+var config;
+
+try {
+    config =  JSON.parse(fs.readFileSync(process.env.HOME + '/.plotly_pm2', 'utf-8'));
+} catch (e) {
+    console.log('No config found at ~/.plotly_pm2 ...');
+    console.log('Please fill in your configuration first!');
+    process.exit(0);
+}
+
 var plotly = require('plotly')(config.username, config.apiKey);
+
 var tokens = config.tokens;
 var defaults = require('./lib/defaults');
 
