@@ -24,5 +24,13 @@
     "dashboard"
   ],
   "author": "Alexander Vados <alex.vados@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexander-daniel/pm2-plotly.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alexander-daniel/pm2-plotly/issues"
+  },
+  "homepage": "https://github.com/alexander-daniel/pm2-plotly"
 }
