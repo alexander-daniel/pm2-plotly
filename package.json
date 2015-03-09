@@ -1,0 +1,28 @@
+{
+  "name": "pm2-plotly",
+  "version": "0.0.1",
+  "description": "Create a quick dashboard to monitor a pm2 app using Plotly",
+  "main": "cmd.js",
+  "bin": {
+    "pm2-plotly": "./cmd.js"
+  },
+  "dependencies": {
+    "moment": "^2.9.0",
+    "body": "^5.0.0",
+    "plotly": "^1.0.2",
+    "pm2": "^0.12.7",
+    "request": "^2.53.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pm2",
+    "plotly",
+    "monitor",
+    "dashboard"
+  ],
+  "author": "Alexander Vados <alex.vados@gmail.com>",
+  "license": "MIT"
+}
