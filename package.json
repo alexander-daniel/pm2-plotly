@@ -1,6 +1,6 @@
 {
   "name": "pm2-plotly",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Create a quick dashboard to monitor a pm2 app using Plotly",
   "main": "cmd.js",
   "bin": {
