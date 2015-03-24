@@ -1,0 +1,35 @@
+<div class="">
+    <div class="row">
+
+        <div class="col s2">
+            <div class="card-panel center-align">
+                <label>processName</label><p data-hook="processName"></p>
+                <label>created</label><p data-hook="creationTime"></p>
+                <label>cpu</label><h4 data-hook="cpuUsage"></h4>
+                <label>freemem</label><h4 data-hook="memoryUsage"></h4>
+
+                <br>
+                <a class="waves-effect waves-light btn-floating">
+                    <i class="mdi-navigation-refresh"></i>
+                </a>
+
+                <a class="waves-effect waves-light btn-floating">
+                    <i class="mdi-navigation-close"></i>
+                </a>
+
+                <a class="waves-effect waves-light btn-floating red">
+                    <i class="mdi-action-delete"></i>
+                </a>
+
+            </div>
+        </div>
+
+        <div class="col s10">
+            <div class="card-panel center-align" id="target">
+            <a data-hook="plotlyLink" target="_blank" style="display: block; text-align: center;">
+                <img data-hook="dashboardImage"/>
+            </a>
+            </div>
+        </div>
+    </div>
+</div>
