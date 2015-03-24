@@ -1,3 +1,7 @@
 node_modules/*
 *.log
 *.DS_Store
+
+ui/bundle.js
+
+ui/css/materialize.min.css
