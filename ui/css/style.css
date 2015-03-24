@@ -1,0 +1,26 @@
+nav {
+  color: #fff;
+  background-color: #265cc3;
+}
+
+h5 {
+    margin-top: 0;
+}
+
+.btn {
+    background-color: #447bdc;
+    margin-bottom: 0;
+}
+
+.btn-floating {
+    background-color: #447bdc;
+    margin-bottom: 0;
+}
+
+.btn:hover {
+    background-color: #284576;
+}
+
+body {
+    background-color: #e0e2e5;
+}

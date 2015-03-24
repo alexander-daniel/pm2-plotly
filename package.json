@@ -2,16 +2,24 @@
   "name": "pm2-plotly",
   "version": "0.0.3",
   "description": "Create a quick dashboard to monitor a pm2 app using Plotly",
-  "main": "cmd.js",
+  "main": "pm2-plotly.js",
   "bin": {
-    "pm2-plotly": "./cmd.js"
+    "pm2-plotly": "./server.js"
   },
   "dependencies": {
-    "moment": "^2.9.0",
-    "body": "^5.0.0",
+    "JSONStream": "^0.10.0",
+    "ampersand-model": "^5.0.0",
+    "ampersand-view": "^7.2.0",
+    "ecstatic": "^0.7.0",
+    "emit.io": "^0.2.3",
+    "hat": "0.0.3",
+    "numeral": "^1.5.3",
     "plotly": "^1.0.2",
     "pm2": "^0.12.7",
-    "request": "^2.53.0"
+    "string-template": "^0.2.0",
+    "timeago-words": "0.0.3",
+    "websocket-stream": "^1.4.0",
+    "ws": "^0.7.1"
   },
   "devDependencies": {},
   "scripts": {
