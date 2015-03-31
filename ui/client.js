@@ -48,11 +48,12 @@ controller.on('processList', function (list) {
         proc.pid = proc.pid.toString();
         proc.pm_id = proc.pm_id.toString();
         var contentDiv = document.getElementById('content');
-        console.log(proc);
+
         var processModel = new ProcessModel(proc);
         var processCard = new ProcessCard(controller);
         processCard.model = processModel;
         processCard.render();
+        
         contentDiv.appendChild(processCard.el);
         processes.push(processCard);
     });
