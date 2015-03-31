@@ -12,37 +12,69 @@ var numeral = require('numeral');
 
 function pm2Plotly (opts) {
     /*jshint validthis: true */
+
+    if (!opts) throw new Error('You have to supply options to pm2-plotly!');
+
     this.config = opts.config;
     this.tokens = this.config.tokens;
+    this.emitStream = null;
     this.streams = {};
     this.loop = null;
     this.pm2 = opts.pm2;
-    var config = this.config;
-    this.plotly = new Plotly(config.username, config.apiKey);
+    this.plotly = new Plotly(opts.config.username, opts.config.apiKey);
+    this.initData = defaults.getData({tokens: opts.config.tokens, maxpoints: 20});
+    this.initLayout = defaults.getLayout();
 }
 
 util.inherits(pm2Plotly, EventEmitter);
 
 module.exports = pm2Plotly;
 
-pm2Plotly.prototype.createDashboard = function (name, emitStream) {
+/**
+ * Returns the list of pm2 apps to the
+ * client stream.
+ */
+pm2Plotly.prototype.listProcesses = function () {
+    var self = this;
+    var pm2 = this.pm2;
+    var emitStream = this.emitStream;
 
-    this.emitStream = emitStream;
+    function onList (err, list) {
+        self.emitTo(emitStream, 'processList', list);
+    }
+
+    pm2.list(onList);
+};
+
+/**
+ * Client emits 'createDashboard' and this gets called with
+ * the target process as the only argument.
+ *
+ *
+ */
+pm2Plotly.prototype.createDashboard = function (processName) {
 
     var self = this;
-    var initdata = defaults.getData({tokens: self.tokens, maxpoints: 20});
-    var initlayout = defaults.getLayout(name);
+    var emitStream = this.emitStream;
+    var plotly = this.plotly;
+    var initdata = this.initData;
+    var initlayout = this.initLayout;
+    var plotURL;
+    var data;
+    var dashBoard;
 
     function onPlotSuccess (err, msg) {
+
         if (self.loop) clearInterval(self.loop);
         if (err) return console.log(err);
-        self.initStreams(name, msg, initdata);
 
-        var plotURL = msg.url;
-        var data = url.parse(plotURL).path.split('~')[1].replace('/', ':');
+        self.initStreams(processName);
 
-        var dashBoard = {
-            processName: name,
+        plotURL = msg.url;
+        data = url.parse(plotURL).path.split('~')[1].replace('/', ':');
+
+        dashBoard = {
+            processName: processName,
             plotURL: plotURL,
             img: plotURL + '.png',
             plotlyData: data,
@@ -53,14 +85,25 @@ pm2Plotly.prototype.createDashboard = function (name, emitStream) {
 
     }
 
-    this.plotly.plot(initdata, initlayout, onPlotSuccess);
+    self.pm2.list(function onList (err, list) {
+        var processes = {};
+
+        list.forEach(function (monitoredProcess) {
+            processes[monitoredProcess.name] = monitoredProcess;
+        });
+
+        if (!processes[processName]) self.emitTo(emitStream, 'processNotFound', processName);
+        else plotly.plot(initdata, initlayout, onPlotSuccess);
+    });
+
 };
 
-pm2Plotly.prototype.initStreams = function (name, msg, initData) {
+pm2Plotly.prototype.initStreams = function (processName) {
     var self = this;
+    var initData = this.initData;
 
-    initData.forEach(function createStream(trace) {
-        var name = trace.name;
+    function createStream (trace) {
+        var traceName = trace.name;
         var token = trace.stream.token;
         var stream = self.plotly.stream(token, function (err, msg) {
             console.log(err, msg);
@@ -70,18 +113,21 @@ pm2Plotly.prototype.initStreams = function (name, msg, initData) {
             clearInterval(self.loop);
         });
 
-        self.streams[name] = stream;
-    });
+        self.streams[traceName] = stream;
+    }
+
+    initData.forEach(createStream);
 
     self.loop = setInterval(function () {
-        self.getStats(name);
+        self.getStats(processName);
     }, 1000);
 };
 
-pm2Plotly.prototype.getStats = function (target) {
+pm2Plotly.prototype.getStats = function (processName) {
     var self = this;
+    var pm2 = this.pm2;
 
-    self.pm2.describe(target, function(err, proc) {
+    pm2.describe(processName, function(err, proc) {
         if (err) return console.log(err);
 
         var targetProcess = proc[0];
