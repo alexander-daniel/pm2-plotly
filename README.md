@@ -1,7 +1,9 @@
 # pm2-plotly
 Create a quick dashboard to monitor [pm2](https://www.npmjs.com/package/pm2) apps using Plotly
 
-![](screen.png)
+![](dash1.png)
+
+![](dash2.png)
 
 ## install
 ```bash

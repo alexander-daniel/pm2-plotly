@@ -8,7 +8,6 @@
  * and piping those through a JSON stream, and
  * then we'll listen to events from the client.
  */
-var fs = require('fs');
 var ecstatic = require('ecstatic');
 var staticServer = ecstatic({root: './ui/'});
 var server = require('http').createServer(staticServer);
@@ -18,6 +17,7 @@ var websocket = require('websocket-stream');
 var JSONStream = require('JSONStream');
 var emitIO = require('emit.io')();
 var hat = require('hat');
+var chalk = require('chalk');
 
 /**
  * Setting up PM2 Module to get information
@@ -27,22 +27,13 @@ var hat = require('hat');
  * You should have at least 2 tokens in there.
  */
 var pm2 = require('pm2');
-var PM2Plotly = require('./pm2-plotly');
-var config;
-
-try {
-    config =  JSON.parse(fs.readFileSync(process.env.HOME + '/.plotly_pm2', 'utf-8'));
-} catch (e) {
-    console.log('No config found at ~/.plotly_pm2 ...');
-    console.log('Please fill in your configuration first!');
-    process.exit(0);
-}
+var PM2Plotly = require('./lib/pm2-plotly');
+var config = require('./lib/get-config')(chalk);
 
 var pm2plotly = new PM2Plotly({
     config: config,
     pm2: pm2
 });
-
 
 /**
  * WebSocketServer handler.
@@ -52,33 +43,36 @@ var pm2plotly = new PM2Plotly({
  * then pipe its events at the instance of pm2plotly.
  *
  * Pipe events originating from pm2plotly back up to the
- * websocket.
+ * websocket to the client.
  *
  */
 function onConnection (ws) {
 
-    // Create a websocket stream from the websocket
+    /* Create a websocket stream from the websocket */
     var wstream = websocket(ws);
 
-    // Create our JSON streams
+    /* Create our JSON streams */
     var parser = JSONStream.parse([true]);
     var stringify = JSONStream.stringify();
 
-    // Hook up PM2Plotly to the global
-    // emitter
+    /* Hook up PM2Plotly to emitIO */
     var emitStream = emitIO(pm2plotly);
     var id = hat(8,16);
     pm2plotly.emitStream = emitStream;
 
-    // Pipe the client info the JSON parser
+    /* Pipe the client info the JSON parser */
     wstream.pipe(parser);
 
-    // Listen for events from the parser, and
-    // trigger them on pm2plotly
+    /**
+     * Listen for events from the parser
+     * and trigger them on pm2plotly
+     */
     emitIO(parser, pm2plotly);
 
-    // stringify and send events from the server/pm2plotly
-    // back to the client
+    /**
+     * stringify and send events from the
+     * server/pm2plotly back to the client
+     */
     emitStream.pipe(stringify).pipe(wstream);
 
     /**
@@ -86,15 +80,12 @@ function onConnection (ws) {
      * Whenever a client emits one of these, events,
      * we can do what we'd like with it.
      */
-
-    pm2plotly.on('list', function () {
-        pm2plotly.listProcesses();
-    });
-
-    pm2plotly.on('createDashboard', function (processName) {
-        pm2plotly.createDashboard(processName);
-    });
-
+    pm2plotly.on('list', pm2plotly.listProcesses.bind(pm2plotly));
+    pm2plotly.on('createDashboard', pm2plotly.createDashboard.bind(pm2plotly));
+    pm2plotly.on('start', pm2plotly.start.bind(pm2plotly));
+    pm2plotly.on('stop', pm2plotly.stop.bind(pm2plotly));
+    pm2plotly.on('restart', pm2plotly.restart.bind(pm2plotly));
+    pm2plotly.on('delete', pm2plotly.createDashboard.bind(pm2plotly));
 
     /**
      * Here we send the client an event to tell them
@@ -109,9 +100,15 @@ function onConnection (ws) {
  * Once all is well, start listening for client
  * connections!
  */
-pm2.connect(function onConnect (err) {
+
+function onConnect (err) {
     if (err) console.log(err);
 
-    server.listen(8000);
+    server.listen(8000, function () {
+        console.log(chalk.magenta('server started on port 8000!'));
+    });
+
     wsServer.on('connection', onConnection);
-});
+}
+
+pm2.connect(onConnect);

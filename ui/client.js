@@ -19,6 +19,7 @@ var DashBoard    = require('./components/dashboard');
 var HeaderBar = require('./components/headerbar');
 var HeaderBarModel = require('./models/headerbar');
 var headerBar = new HeaderBar(controller);
+
 headerBar.model = new HeaderBarModel();
 headerBar.model.title = 'pm2-plotly';
 headerBar.render();
@@ -53,7 +54,7 @@ controller.on('processList', function (list) {
         var processCard = new ProcessCard(controller);
         processCard.model = processModel;
         processCard.render();
-        
+
         contentDiv.appendChild(processCard.el);
         processes.push(processCard);
     });

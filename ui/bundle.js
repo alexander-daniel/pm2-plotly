@@ -1,6 +1,8 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/browser-resolve/empty.js":[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
-},{}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js":[function(require,module,exports){
+},{}],2:[function(require,module,exports){
+arguments[4][1][0].apply(exports,arguments)
+},{"dup":1}],3:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -67,41 +69,36 @@ Buffer.TYPED_ARRAY_SUPPORT = (function () {
  * By augmenting the instances, we can avoid modifying the `Uint8Array`
  * prototype.
  */
-function Buffer (subject, encoding, noZero) {
-  if (!(this instanceof Buffer))
-    return new Buffer(subject, encoding, noZero)
+function Buffer (subject, encoding) {
+  var self = this
+  if (!(self instanceof Buffer)) return new Buffer(subject, encoding)
 
   var type = typeof subject
-
-  // Find the length
   var length
+
   if (type === 'number') {
     length = +subject
   } else if (type === 'string') {
     length = Buffer.byteLength(subject, encoding)
-  } else if (type === 'object' && subject !== null) { // assume object is array-like
-    if (subject.type === 'Buffer' && isArray(subject.data))
-      subject = subject.data
+  } else if (type === 'object' && subject !== null) {
+    // assume object is array-like
+    if (subject.type === 'Buffer' && isArray(subject.data)) subject = subject.data
     length = +subject.length
   } else {
     throw new TypeError('must start with number, buffer, array or string')
   }
 
-  if (length > kMaxLength)
-    throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
-      'size: 0x' + kMaxLength.toString(16) + ' bytes')
+  if (length > kMaxLength) {
+    throw new RangeError('Attempt to allocate Buffer larger than maximum size: 0x' +
+      kMaxLength.toString(16) + ' bytes')
+  }
 
-  if (length < 0)
-    length = 0
-  else
-    length >>>= 0 // Coerce to uint32.
+  if (length < 0) length = 0
+  else length >>>= 0 // coerce to uint32
 
-  var self = this
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     // Preferred: Return an augmented `Uint8Array` instance for best performance
-    /*eslint-disable consistent-this */
-    self = Buffer._augment(new Uint8Array(length))
-    /*eslint-enable consistent-this */
+    self = Buffer._augment(new Uint8Array(length)) // eslint-disable-line consistent-this
   } else {
     // Fallback: Return THIS instance of Buffer (created by `new`)
     self.length = length
@@ -115,42 +112,43 @@ function Buffer (subject, encoding, noZero) {
   } else if (isArrayish(subject)) {
     // Treat array-ish objects as a byte array
     if (Buffer.isBuffer(subject)) {
-      for (i = 0; i < length; i++)
+      for (i = 0; i < length; i++) {
         self[i] = subject.readUInt8(i)
+      }
     } else {
-      for (i = 0; i < length; i++)
+      for (i = 0; i < length; i++) {
         self[i] = ((subject[i] % 256) + 256) % 256
+      }
     }
   } else if (type === 'string') {
     self.write(subject, 0, encoding)
-  } else if (type === 'number' && !Buffer.TYPED_ARRAY_SUPPORT && !noZero) {
+  } else if (type === 'number' && !Buffer.TYPED_ARRAY_SUPPORT) {
     for (i = 0; i < length; i++) {
       self[i] = 0
     }
   }
 
-  if (length > 0 && length <= Buffer.poolSize)
-    self.parent = rootParent
+  if (length > 0 && length <= Buffer.poolSize) self.parent = rootParent
 
   return self
 }
 
-function SlowBuffer (subject, encoding, noZero) {
-  if (!(this instanceof SlowBuffer))
-    return new SlowBuffer(subject, encoding, noZero)
+function SlowBuffer (subject, encoding) {
+  if (!(this instanceof SlowBuffer)) return new SlowBuffer(subject, encoding)
 
-  var buf = new Buffer(subject, encoding, noZero)
+  var buf = new Buffer(subject, encoding)
   delete buf.parent
   return buf
 }
 
-Buffer.isBuffer = function (b) {
+Buffer.isBuffer = function isBuffer (b) {
   return !!(b != null && b._isBuffer)
 }
 
-Buffer.compare = function (a, b) {
-  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b))
+Buffer.compare = function compare (a, b) {
+  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b)) {
     throw new TypeError('Arguments must be Buffers')
+  }
 
   if (a === b) return 0
 
@@ -166,7 +164,7 @@ Buffer.compare = function (a, b) {
   return 0
 }
 
-Buffer.isEncoding = function (encoding) {
+Buffer.isEncoding = function isEncoding (encoding) {
   switch (String(encoding).toLowerCase()) {
     case 'hex':
     case 'utf8':
@@ -185,8 +183,8 @@ Buffer.isEncoding = function (encoding) {
   }
 }
 
-Buffer.concat = function (list, totalLength) {
-  if (!isArray(list)) throw new TypeError('Usage: Buffer.concat(list[, length])')
+Buffer.concat = function concat (list, totalLength) {
+  if (!isArray(list)) throw new TypeError('list argument must be an Array of Buffers.')
 
   if (list.length === 0) {
     return new Buffer(0)
@@ -212,7 +210,7 @@ Buffer.concat = function (list, totalLength) {
   return buf
 }
 
-Buffer.byteLength = function (str, encoding) {
+Buffer.byteLength = function byteLength (str, encoding) {
   var ret
   str = str + ''
   switch (encoding || 'utf8') {
@@ -248,7 +246,7 @@ Buffer.prototype.length = undefined
 Buffer.prototype.parent = undefined
 
 // toString(encoding, start=0, end=buffer.length)
-Buffer.prototype.toString = function (encoding, start, end) {
+Buffer.prototype.toString = function toString (encoding, start, end) {
   var loweredCase = false
 
   start = start >>> 0
@@ -284,45 +282,84 @@ Buffer.prototype.toString = function (encoding, start, end) {
         return utf16leSlice(this, start, end)
 
       default:
-        if (loweredCase)
-          throw new TypeError('Unknown encoding: ' + encoding)
+        if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
         encoding = (encoding + '').toLowerCase()
         loweredCase = true
     }
   }
 }
 
-Buffer.prototype.equals = function (b) {
+Buffer.prototype.equals = function equals (b) {
   if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
   if (this === b) return true
   return Buffer.compare(this, b) === 0
 }
 
-Buffer.prototype.inspect = function () {
+Buffer.prototype.inspect = function inspect () {
   var str = ''
   var max = exports.INSPECT_MAX_BYTES
   if (this.length > 0) {
     str = this.toString('hex', 0, max).match(/.{2}/g).join(' ')
-    if (this.length > max)
-      str += ' ... '
+    if (this.length > max) str += ' ... '
   }
   return '<Buffer ' + str + '>'
 }
 
-Buffer.prototype.compare = function (b) {
+Buffer.prototype.compare = function compare (b) {
   if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
   if (this === b) return 0
   return Buffer.compare(this, b)
 }
 
+Buffer.prototype.indexOf = function indexOf (val, byteOffset) {
+  if (byteOffset > 0x7fffffff) byteOffset = 0x7fffffff
+  else if (byteOffset < -0x80000000) byteOffset = -0x80000000
+  byteOffset >>= 0
+
+  if (this.length === 0) return -1
+  if (byteOffset >= this.length) return -1
+
+  // Negative offsets start from the end of the buffer
+  if (byteOffset < 0) byteOffset = Math.max(this.length + byteOffset, 0)
+
+  if (typeof val === 'string') {
+    if (val.length === 0) return -1 // special case: looking for empty string always fails
+    return String.prototype.indexOf.call(this, val, byteOffset)
+  }
+  if (Buffer.isBuffer(val)) {
+    return arrayIndexOf(this, val, byteOffset)
+  }
+  if (typeof val === 'number') {
+    if (Buffer.TYPED_ARRAY_SUPPORT && Uint8Array.prototype.indexOf === 'function') {
+      return Uint8Array.prototype.indexOf.call(this, val, byteOffset)
+    }
+    return arrayIndexOf(this, [ val ], byteOffset)
+  }
+
+  function arrayIndexOf (arr, val, byteOffset) {
+    var foundIndex = -1
+    for (var i = 0; byteOffset + i < arr.length; i++) {
+      if (arr[byteOffset + i] === val[foundIndex === -1 ? 0 : i - foundIndex]) {
+        if (foundIndex === -1) foundIndex = i
+        if (i - foundIndex + 1 === val.length) return byteOffset + foundIndex
+      } else {
+        foundIndex = -1
+      }
+    }
+    return -1
+  }
+
+  throw new TypeError('val must be string, number or Buffer')
+}
+
 // `get` will be removed in Node 0.13+
-Buffer.prototype.get = function (offset) {
+Buffer.prototype.get = function get (offset) {
   console.log('.get() is deprecated. Access using array indexes instead.')
   return this.readUInt8(offset)
 }
 
 // `set` will be removed in Node 0.13+
-Buffer.prototype.set = function (v, offset) {
+Buffer.prototype.set = function set (v, offset) {
   console.log('.set() is deprecated. Access using array indexes instead.')
   return this.writeUInt8(v, offset)
 }
@@ -347,9 +384,9 @@ function hexWrite (buf, string, offset, length) {
     length = strLen / 2
   }
   for (var i = 0; i < length; i++) {
-    var byte = parseInt(string.substr(i * 2, 2), 16)
-    if (isNaN(byte)) throw new Error('Invalid hex string')
-    buf[offset + i] = byte
+    var parsed = parseInt(string.substr(i * 2, 2), 16)
+    if (isNaN(parsed)) throw new Error('Invalid hex string')
+    buf[offset + i] = parsed
   }
   return i
 }
@@ -378,7 +415,7 @@ function utf16leWrite (buf, string, offset, length) {
   return charsWritten
 }
 
-Buffer.prototype.write = function (string, offset, length, encoding) {
+Buffer.prototype.write = function write (string, offset, length, encoding) {
   // Support both (string, offset, length, encoding)
   // and the legacy (string, encoding, offset, length)
   if (isFinite(offset)) {
@@ -395,8 +432,9 @@ Buffer.prototype.write = function (string, offset, length, encoding) {
 
   offset = Number(offset) || 0
 
-  if (length < 0 || offset < 0 || offset > this.length)
+  if (length < 0 || offset < 0 || offset > this.length) {
     throw new RangeError('attempt to write outside buffer bounds')
+  }
 
   var remaining = this.length - offset
   if (!length) {
@@ -439,7 +477,7 @@ Buffer.prototype.write = function (string, offset, length, encoding) {
   return ret
 }
 
-Buffer.prototype.toJSON = function () {
+Buffer.prototype.toJSON = function toJSON () {
   return {
     type: 'Buffer',
     data: Array.prototype.slice.call(this._arr || this, 0)
@@ -513,43 +551,39 @@ function utf16leSlice (buf, start, end) {
   return res
 }
 
-Buffer.prototype.slice = function (start, end) {
+Buffer.prototype.slice = function slice (start, end) {
   var len = this.length
   start = ~~start
   end = end === undefined ? len : ~~end
 
   if (start < 0) {
     start += len
-    if (start < 0)
-      start = 0
+    if (start < 0) start = 0
   } else if (start > len) {
     start = len
   }
 
   if (end < 0) {
     end += len
-    if (end < 0)
-      end = 0
+    if (end < 0) end = 0
   } else if (end > len) {
     end = len
   }
 
-  if (end < start)
-    end = start
+  if (end < start) end = start
 
   var newBuf
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     newBuf = Buffer._augment(this.subarray(start, end))
   } else {
     var sliceLen = end - start
-    newBuf = new Buffer(sliceLen, undefined, true)
+    newBuf = new Buffer(sliceLen, undefined)
     for (var i = 0; i < sliceLen; i++) {
       newBuf[i] = this[i + start]
     }
   }
 
-  if (newBuf.length)
-    newBuf.parent = this.parent || this
+  if (newBuf.length) newBuf.parent = this.parent || this
 
   return newBuf
 }
@@ -558,62 +592,58 @@ Buffer.prototype.slice = function (start, end) {
  * Need to make sure that buffer isn't trying to write out of bounds.
  */
 function checkOffset (offset, ext, length) {
-  if ((offset % 1) !== 0 || offset < 0)
-    throw new RangeError('offset is not uint')
-  if (offset + ext > length)
-    throw new RangeError('Trying to access beyond buffer length')
+  if ((offset % 1) !== 0 || offset < 0) throw new RangeError('offset is not uint')
+  if (offset + ext > length) throw new RangeError('Trying to access beyond buffer length')
 }
 
-Buffer.prototype.readUIntLE = function (offset, byteLength, noAssert) {
+Buffer.prototype.readUIntLE = function readUIntLE (offset, byteLength, noAssert) {
   offset = offset >>> 0
   byteLength = byteLength >>> 0
-  if (!noAssert)
-    checkOffset(offset, byteLength, this.length)
+  if (!noAssert) checkOffset(offset, byteLength, this.length)
 
   var val = this[offset]
   var mul = 1
   var i = 0
-  while (++i < byteLength && (mul *= 0x100))
+  while (++i < byteLength && (mul *= 0x100)) {
     val += this[offset + i] * mul
+  }
 
   return val
 }
 
-Buffer.prototype.readUIntBE = function (offset, byteLength, noAssert) {
+Buffer.prototype.readUIntBE = function readUIntBE (offset, byteLength, noAssert) {
   offset = offset >>> 0
   byteLength = byteLength >>> 0
-  if (!noAssert)
+  if (!noAssert) {
     checkOffset(offset, byteLength, this.length)
+  }
 
   var val = this[offset + --byteLength]
   var mul = 1
-  while (byteLength > 0 && (mul *= 0x100))
+  while (byteLength > 0 && (mul *= 0x100)) {
     val += this[offset + --byteLength] * mul
+  }
 
   return val
 }
 
-Buffer.prototype.readUInt8 = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 1, this.length)
+Buffer.prototype.readUInt8 = function readUInt8 (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 1, this.length)
   return this[offset]
 }
 
-Buffer.prototype.readUInt16LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
+Buffer.prototype.readUInt16LE = function readUInt16LE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 2, this.length)
   return this[offset] | (this[offset + 1] << 8)
 }
 
-Buffer.prototype.readUInt16BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
+Buffer.prototype.readUInt16BE = function readUInt16BE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 2, this.length)
   return (this[offset] << 8) | this[offset + 1]
 }
 
-Buffer.prototype.readUInt32LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
+Buffer.prototype.readUInt32LE = function readUInt32LE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
 
   return ((this[offset]) |
       (this[offset + 1] << 8) |
@@ -621,117 +651,104 @@ Buffer.prototype.readUInt32LE = function (offset, noAssert) {
       (this[offset + 3] * 0x1000000)
 }
 
-Buffer.prototype.readUInt32BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
+Buffer.prototype.readUInt32BE = function readUInt32BE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
 
   return (this[offset] * 0x1000000) +
-      ((this[offset + 1] << 16) |
-      (this[offset + 2] << 8) |
-      this[offset + 3])
+    ((this[offset + 1] << 16) |
+    (this[offset + 2] << 8) |
+    this[offset + 3])
 }
 
-Buffer.prototype.readIntLE = function (offset, byteLength, noAssert) {
+Buffer.prototype.readIntLE = function readIntLE (offset, byteLength, noAssert) {
   offset = offset >>> 0
   byteLength = byteLength >>> 0
-  if (!noAssert)
-    checkOffset(offset, byteLength, this.length)
+  if (!noAssert) checkOffset(offset, byteLength, this.length)
 
   var val = this[offset]
   var mul = 1
   var i = 0
-  while (++i < byteLength && (mul *= 0x100))
+  while (++i < byteLength && (mul *= 0x100)) {
     val += this[offset + i] * mul
+  }
   mul *= 0x80
 
-  if (val >= mul)
-    val -= Math.pow(2, 8 * byteLength)
+  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
 
   return val
 }
 
-Buffer.prototype.readIntBE = function (offset, byteLength, noAssert) {
+Buffer.prototype.readIntBE = function readIntBE (offset, byteLength, noAssert) {
   offset = offset >>> 0
   byteLength = byteLength >>> 0
-  if (!noAssert)
-    checkOffset(offset, byteLength, this.length)
+  if (!noAssert) checkOffset(offset, byteLength, this.length)
 
   var i = byteLength
   var mul = 1
   var val = this[offset + --i]
-  while (i > 0 && (mul *= 0x100))
+  while (i > 0 && (mul *= 0x100)) {
     val += this[offset + --i] * mul
+  }
   mul *= 0x80
 
-  if (val >= mul)
-    val -= Math.pow(2, 8 * byteLength)
+  if (val >= mul) val -= Math.pow(2, 8 * byteLength)
 
   return val
 }
 
-Buffer.prototype.readInt8 = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 1, this.length)
-  if (!(this[offset] & 0x80))
-    return (this[offset])
+Buffer.prototype.readInt8 = function readInt8 (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 1, this.length)
+  if (!(this[offset] & 0x80)) return (this[offset])
   return ((0xff - this[offset] + 1) * -1)
 }
 
-Buffer.prototype.readInt16LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
+Buffer.prototype.readInt16LE = function readInt16LE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 2, this.length)
   var val = this[offset] | (this[offset + 1] << 8)
   return (val & 0x8000) ? val | 0xFFFF0000 : val
 }
 
-Buffer.prototype.readInt16BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 2, this.length)
+Buffer.prototype.readInt16BE = function readInt16BE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 2, this.length)
   var val = this[offset + 1] | (this[offset] << 8)
   return (val & 0x8000) ? val | 0xFFFF0000 : val
 }
 
-Buffer.prototype.readInt32LE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
+Buffer.prototype.readInt32LE = function readInt32LE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
 
   return (this[offset]) |
-      (this[offset + 1] << 8) |
-      (this[offset + 2] << 16) |
-      (this[offset + 3] << 24)
+    (this[offset + 1] << 8) |
+    (this[offset + 2] << 16) |
+    (this[offset + 3] << 24)
 }
 
-Buffer.prototype.readInt32BE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
+Buffer.prototype.readInt32BE = function readInt32BE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
 
   return (this[offset] << 24) |
-      (this[offset + 1] << 16) |
-      (this[offset + 2] << 8) |
-      (this[offset + 3])
+    (this[offset + 1] << 16) |
+    (this[offset + 2] << 8) |
+    (this[offset + 3])
 }
 
-Buffer.prototype.readFloatLE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
+Buffer.prototype.readFloatLE = function readFloatLE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
   return ieee754.read(this, offset, true, 23, 4)
 }
 
-Buffer.prototype.readFloatBE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 4, this.length)
+Buffer.prototype.readFloatBE = function readFloatBE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 4, this.length)
   return ieee754.read(this, offset, false, 23, 4)
 }
 
-Buffer.prototype.readDoubleLE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 8, this.length)
+Buffer.prototype.readDoubleLE = function readDoubleLE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 8, this.length)
   return ieee754.read(this, offset, true, 52, 8)
 }
 
-Buffer.prototype.readDoubleBE = function (offset, noAssert) {
-  if (!noAssert)
-    checkOffset(offset, 8, this.length)
+Buffer.prototype.readDoubleBE = function readDoubleBE (offset, noAssert) {
+  if (!noAssert) checkOffset(offset, 8, this.length)
   return ieee754.read(this, offset, false, 52, 8)
 }
 
@@ -741,43 +758,42 @@ function checkInt (buf, value, offset, ext, max, min) {
   if (offset + ext > buf.length) throw new RangeError('index out of range')
 }
 
-Buffer.prototype.writeUIntLE = function (value, offset, byteLength, noAssert) {
+Buffer.prototype.writeUIntLE = function writeUIntLE (value, offset, byteLength, noAssert) {
   value = +value
   offset = offset >>> 0
   byteLength = byteLength >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+  if (!noAssert) checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
 
   var mul = 1
   var i = 0
   this[offset] = value & 0xFF
-  while (++i < byteLength && (mul *= 0x100))
+  while (++i < byteLength && (mul *= 0x100)) {
     this[offset + i] = (value / mul) >>> 0 & 0xFF
+  }
 
   return offset + byteLength
 }
 
-Buffer.prototype.writeUIntBE = function (value, offset, byteLength, noAssert) {
+Buffer.prototype.writeUIntBE = function writeUIntBE (value, offset, byteLength, noAssert) {
   value = +value
   offset = offset >>> 0
   byteLength = byteLength >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+  if (!noAssert) checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
 
   var i = byteLength - 1
   var mul = 1
   this[offset + i] = value & 0xFF
-  while (--i >= 0 && (mul *= 0x100))
+  while (--i >= 0 && (mul *= 0x100)) {
     this[offset + i] = (value / mul) >>> 0 & 0xFF
+  }
 
   return offset + byteLength
 }
 
-Buffer.prototype.writeUInt8 = function (value, offset, noAssert) {
+Buffer.prototype.writeUInt8 = function writeUInt8 (value, offset, noAssert) {
   value = +value
   offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 1, 0xff, 0)
+  if (!noAssert) checkInt(this, value, offset, 1, 0xff, 0)
   if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
   this[offset] = value
   return offset + 1
@@ -791,27 +807,29 @@ function objectWriteUInt16 (buf, value, offset, littleEndian) {
   }
 }
 
-Buffer.prototype.writeUInt16LE = function (value, offset, noAssert) {
+Buffer.prototype.writeUInt16LE = function writeUInt16LE (value, offset, noAssert) {
   value = +value
   offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0xffff, 0)
+  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     this[offset] = value
     this[offset + 1] = (value >>> 8)
-  } else objectWriteUInt16(this, value, offset, true)
+  } else {
+    objectWriteUInt16(this, value, offset, true)
+  }
   return offset + 2
 }
 
-Buffer.prototype.writeUInt16BE = function (value, offset, noAssert) {
+Buffer.prototype.writeUInt16BE = function writeUInt16BE (value, offset, noAssert) {
   value = +value
   offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0xffff, 0)
+  if (!noAssert) checkInt(this, value, offset, 2, 0xffff, 0)
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     this[offset] = (value >>> 8)
     this[offset + 1] = value
-  } else objectWriteUInt16(this, value, offset, false)
+  } else {
+    objectWriteUInt16(this, value, offset, false)
+  }
   return offset + 2
 }
 
@@ -822,139 +840,144 @@ function objectWriteUInt32 (buf, value, offset, littleEndian) {
   }
 }
 
-Buffer.prototype.writeUInt32LE = function (value, offset, noAssert) {
+Buffer.prototype.writeUInt32LE = function writeUInt32LE (value, offset, noAssert) {
   value = +value
   offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0xffffffff, 0)
+  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     this[offset + 3] = (value >>> 24)
     this[offset + 2] = (value >>> 16)
     this[offset + 1] = (value >>> 8)
     this[offset] = value
-  } else objectWriteUInt32(this, value, offset, true)
+  } else {
+    objectWriteUInt32(this, value, offset, true)
+  }
   return offset + 4
 }
 
-Buffer.prototype.writeUInt32BE = function (value, offset, noAssert) {
+Buffer.prototype.writeUInt32BE = function writeUInt32BE (value, offset, noAssert) {
   value = +value
   offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0xffffffff, 0)
+  if (!noAssert) checkInt(this, value, offset, 4, 0xffffffff, 0)
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     this[offset] = (value >>> 24)
     this[offset + 1] = (value >>> 16)
     this[offset + 2] = (value >>> 8)
     this[offset + 3] = value
-  } else objectWriteUInt32(this, value, offset, false)
+  } else {
+    objectWriteUInt32(this, value, offset, false)
+  }
   return offset + 4
 }
 
-Buffer.prototype.writeIntLE = function (value, offset, byteLength, noAssert) {
+Buffer.prototype.writeIntLE = function writeIntLE (value, offset, byteLength, noAssert) {
   value = +value
   offset = offset >>> 0
   if (!noAssert) {
-    checkInt(this,
-             value,
-             offset,
-             byteLength,
-             Math.pow(2, 8 * byteLength - 1) - 1,
-             -Math.pow(2, 8 * byteLength - 1))
+    checkInt(
+      this, value, offset, byteLength,
+      Math.pow(2, 8 * byteLength - 1) - 1,
+      -Math.pow(2, 8 * byteLength - 1)
+    )
   }
 
   var i = 0
   var mul = 1
   var sub = value < 0 ? 1 : 0
   this[offset] = value & 0xFF
-  while (++i < byteLength && (mul *= 0x100))
+  while (++i < byteLength && (mul *= 0x100)) {
     this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+  }
 
   return offset + byteLength
 }
 
-Buffer.prototype.writeIntBE = function (value, offset, byteLength, noAssert) {
+Buffer.prototype.writeIntBE = function writeIntBE (value, offset, byteLength, noAssert) {
   value = +value
   offset = offset >>> 0
   if (!noAssert) {
-    checkInt(this,
-             value,
-             offset,
-             byteLength,
-             Math.pow(2, 8 * byteLength - 1) - 1,
-             -Math.pow(2, 8 * byteLength - 1))
+    checkInt(
+      this, value, offset, byteLength,
+      Math.pow(2, 8 * byteLength - 1) - 1,
+      -Math.pow(2, 8 * byteLength - 1)
+    )
   }
 
   var i = byteLength - 1
   var mul = 1
   var sub = value < 0 ? 1 : 0
   this[offset + i] = value & 0xFF
-  while (--i >= 0 && (mul *= 0x100))
+  while (--i >= 0 && (mul *= 0x100)) {
     this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+  }
 
   return offset + byteLength
 }
 
-Buffer.prototype.writeInt8 = function (value, offset, noAssert) {
+Buffer.prototype.writeInt8 = function writeInt8 (value, offset, noAssert) {
   value = +value
   offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 1, 0x7f, -0x80)
+  if (!noAssert) checkInt(this, value, offset, 1, 0x7f, -0x80)
   if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value)
   if (value < 0) value = 0xff + value + 1
   this[offset] = value
   return offset + 1
 }
 
-Buffer.prototype.writeInt16LE = function (value, offset, noAssert) {
+Buffer.prototype.writeInt16LE = function writeInt16LE (value, offset, noAssert) {
   value = +value
   offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     this[offset] = value
     this[offset + 1] = (value >>> 8)
-  } else objectWriteUInt16(this, value, offset, true)
+  } else {
+    objectWriteUInt16(this, value, offset, true)
+  }
   return offset + 2
 }
 
-Buffer.prototype.writeInt16BE = function (value, offset, noAssert) {
+Buffer.prototype.writeInt16BE = function writeInt16BE (value, offset, noAssert) {
   value = +value
   offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 2, 0x7fff, -0x8000)
+  if (!noAssert) checkInt(this, value, offset, 2, 0x7fff, -0x8000)
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     this[offset] = (value >>> 8)
     this[offset + 1] = value
-  } else objectWriteUInt16(this, value, offset, false)
+  } else {
+    objectWriteUInt16(this, value, offset, false)
+  }
   return offset + 2
 }
 
-Buffer.prototype.writeInt32LE = function (value, offset, noAssert) {
+Buffer.prototype.writeInt32LE = function writeInt32LE (value, offset, noAssert) {
   value = +value
   offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     this[offset] = value
     this[offset + 1] = (value >>> 8)
     this[offset + 2] = (value >>> 16)
     this[offset + 3] = (value >>> 24)
-  } else objectWriteUInt32(this, value, offset, true)
+  } else {
+    objectWriteUInt32(this, value, offset, true)
+  }
   return offset + 4
 }
 
-Buffer.prototype.writeInt32BE = function (value, offset, noAssert) {
+Buffer.prototype.writeInt32BE = function writeInt32BE (value, offset, noAssert) {
   value = +value
   offset = offset >>> 0
-  if (!noAssert)
-    checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
+  if (!noAssert) checkInt(this, value, offset, 4, 0x7fffffff, -0x80000000)
   if (value < 0) value = 0xffffffff + value + 1
   if (Buffer.TYPED_ARRAY_SUPPORT) {
     this[offset] = (value >>> 24)
     this[offset + 1] = (value >>> 16)
     this[offset + 2] = (value >>> 8)
     this[offset + 3] = value
-  } else objectWriteUInt32(this, value, offset, false)
+  } else {
+    objectWriteUInt32(this, value, offset, false)
+  }
   return offset + 4
 }
 
@@ -965,39 +988,39 @@ function checkIEEE754 (buf, value, offset, ext, max, min) {
 }
 
 function writeFloat (buf, value, offset, littleEndian, noAssert) {
-  if (!noAssert)
+  if (!noAssert) {
     checkIEEE754(buf, value, offset, 4, 3.4028234663852886e+38, -3.4028234663852886e+38)
+  }
   ieee754.write(buf, value, offset, littleEndian, 23, 4)
   return offset + 4
 }
 
-Buffer.prototype.writeFloatLE = function (value, offset, noAssert) {
+Buffer.prototype.writeFloatLE = function writeFloatLE (value, offset, noAssert) {
   return writeFloat(this, value, offset, true, noAssert)
 }
 
-Buffer.prototype.writeFloatBE = function (value, offset, noAssert) {
+Buffer.prototype.writeFloatBE = function writeFloatBE (value, offset, noAssert) {
   return writeFloat(this, value, offset, false, noAssert)
 }
 
 function writeDouble (buf, value, offset, littleEndian, noAssert) {
-  if (!noAssert)
+  if (!noAssert) {
     checkIEEE754(buf, value, offset, 8, 1.7976931348623157E+308, -1.7976931348623157E+308)
+  }
   ieee754.write(buf, value, offset, littleEndian, 52, 8)
   return offset + 8
 }
 
-Buffer.prototype.writeDoubleLE = function (value, offset, noAssert) {
+Buffer.prototype.writeDoubleLE = function writeDoubleLE (value, offset, noAssert) {
   return writeDouble(this, value, offset, true, noAssert)
 }
 
-Buffer.prototype.writeDoubleBE = function (value, offset, noAssert) {
+Buffer.prototype.writeDoubleBE = function writeDoubleBE (value, offset, noAssert) {
   return writeDouble(this, value, offset, false, noAssert)
 }
 
 // copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
-Buffer.prototype.copy = function (target, target_start, start, end) {
-  var self = this // source
-
+Buffer.prototype.copy = function copy (target, target_start, start, end) {
   if (!start) start = 0
   if (!end && end !== 0) end = this.length
   if (target_start >= target.length) target_start = target.length
@@ -1006,19 +1029,20 @@ Buffer.prototype.copy = function (target, target_start, start, end) {
 
   // Copy 0 bytes; we're done
   if (end === start) return 0
-  if (target.length === 0 || self.length === 0) return 0
+  if (target.length === 0 || this.length === 0) return 0
 
   // Fatal error conditions
-  if (target_start < 0)
+  if (target_start < 0) {
     throw new RangeError('targetStart out of bounds')
-  if (start < 0 || start >= self.length) throw new RangeError('sourceStart out of bounds')
+  }
+  if (start < 0 || start >= this.length) throw new RangeError('sourceStart out of bounds')
   if (end < 0) throw new RangeError('sourceEnd out of bounds')
 
   // Are we oob?
-  if (end > this.length)
-    end = this.length
-  if (target.length - target_start < end - start)
+  if (end > this.length) end = this.length
+  if (target.length - target_start < end - start) {
     end = target.length - target_start + start
+  }
 
   var len = end - start
 
@@ -1034,7 +1058,7 @@ Buffer.prototype.copy = function (target, target_start, start, end) {
 }
 
 // fill(value, start=0, end=buffer.length)
-Buffer.prototype.fill = function (value, start, end) {
+Buffer.prototype.fill = function fill (value, start, end) {
   if (!value) value = 0
   if (!start) start = 0
   if (!end) end = this.length
@@ -1068,7 +1092,7 @@ Buffer.prototype.fill = function (value, start, end) {
  * Creates a new `ArrayBuffer` with the *copied* memory of the buffer instance.
  * Added in Node 0.12. Only available in browsers that support ArrayBuffer.
  */
-Buffer.prototype.toArrayBuffer = function () {
+Buffer.prototype.toArrayBuffer = function toArrayBuffer () {
   if (typeof Uint8Array !== 'undefined') {
     if (Buffer.TYPED_ARRAY_SUPPORT) {
       return (new Buffer(this)).buffer
@@ -1092,12 +1116,11 @@ var BP = Buffer.prototype
 /**
  * Augment a Uint8Array *instance* (not the Uint8Array class!) with Buffer methods
  */
-Buffer._augment = function (arr) {
+Buffer._augment = function _augment (arr) {
   arr.constructor = Buffer
   arr._isBuffer = true
 
-  // save reference to original Uint8Array get/set methods before overwriting
-  arr._get = arr.get
+  // save reference to original Uint8Array set method before overwriting
   arr._set = arr.set
 
   // deprecated, will be removed in node 0.13+
@@ -1110,6 +1133,7 @@ Buffer._augment = function (arr) {
   arr.toJSON = BP.toJSON
   arr.equals = BP.equals
   arr.compare = BP.compare
+  arr.indexOf = BP.indexOf
   arr.copy = BP.copy
   arr.slice = BP.slice
   arr.readUIntLE = BP.readUIntLE
@@ -1297,8 +1321,7 @@ function base64ToBytes (str) {
 
 function blitBuffer (src, dst, offset, length) {
   for (var i = 0; i < length; i++) {
-    if ((i + offset >= dst.length) || (i >= src.length))
-      break
+    if ((i + offset >= dst.length) || (i >= src.length)) break
     dst[i + offset] = src[i]
   }
   return i
@@ -1312,7 +1335,7 @@ function decodeUtf8Char (str) {
   }
 }
 
-},{"base64-js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/base64-js/lib/b64.js","ieee754":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/ieee754/index.js","is-array":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/is-array/index.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/base64-js/lib/b64.js":[function(require,module,exports){
+},{"base64-js":4,"ieee754":5,"is-array":6}],4:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -1438,7 +1461,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/ieee754/index.js":[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -1524,7 +1547,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/node_modules/is-array/index.js":[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 
 /**
  * isArray
@@ -1559,7 +1582,7 @@ module.exports = isArray || function (val) {
   return !! val && '[object Array]' == str.call(val);
 };
 
-},{}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js":[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1862,7 +1885,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js":[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -1887,12 +1910,12 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/isarray/index.js":[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js":[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1952,10 +1975,10 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/duplex.js":[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_duplex.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_duplex.js":[function(require,module,exports){
+},{"./lib/_stream_duplex.js":12}],12:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2048,7 +2071,7 @@ function forEach (xs, f) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_readable":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_readable.js","./_stream_writable":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_writable.js","_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","core-util-is":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","inherits":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_passthrough.js":[function(require,module,exports){
+},{"./_stream_readable":14,"./_stream_writable":16,"_process":10,"core-util-is":17,"inherits":8}],13:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2096,7 +2119,7 @@ PassThrough.prototype._transform = function(chunk, encoding, cb) {
   cb(null, chunk);
 };
 
-},{"./_stream_transform":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_transform.js","core-util-is":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","inherits":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_readable.js":[function(require,module,exports){
+},{"./_stream_transform":15,"core-util-is":17,"inherits":8}],14:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -3051,7 +3074,7 @@ function indexOf (xs, x) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_duplex.js","_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js","core-util-is":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","events":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js","inherits":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js","isarray":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/isarray/index.js","stream":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/stream-browserify/index.js","string_decoder/":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/string_decoder/index.js","util":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/browser-resolve/empty.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_transform.js":[function(require,module,exports){
+},{"./_stream_duplex":12,"_process":10,"buffer":3,"core-util-is":17,"events":7,"inherits":8,"isarray":9,"stream":22,"string_decoder/":23,"util":2}],15:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -3262,7 +3285,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_duplex.js","core-util-is":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","inherits":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_writable.js":[function(require,module,exports){
+},{"./_stream_duplex":12,"core-util-is":17,"inherits":8}],16:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -3743,7 +3766,7 @@ function endWritable(stream, state, cb) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_duplex.js","_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js","core-util-is":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","inherits":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js","stream":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/stream-browserify/index.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js":[function(require,module,exports){
+},{"./_stream_duplex":12,"_process":10,"buffer":3,"core-util-is":17,"inherits":8,"stream":22}],17:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -3853,10 +3876,10 @@ function objectToString(o) {
   return Object.prototype.toString.call(o);
 }
 }).call(this,require("buffer").Buffer)
-},{"buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/passthrough.js":[function(require,module,exports){
+},{"buffer":3}],18:[function(require,module,exports){
 module.exports = require("./lib/_stream_passthrough.js")
 
-},{"./lib/_stream_passthrough.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_passthrough.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/readable.js":[function(require,module,exports){
+},{"./lib/_stream_passthrough.js":13}],19:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = require('stream');
 exports.Readable = exports;
@@ -3865,13 +3888,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_duplex.js","./lib/_stream_passthrough.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_passthrough.js","./lib/_stream_readable.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_readable.js","./lib/_stream_transform.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_transform.js","./lib/_stream_writable.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_writable.js","stream":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/stream-browserify/index.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/transform.js":[function(require,module,exports){
+},{"./lib/_stream_duplex.js":12,"./lib/_stream_passthrough.js":13,"./lib/_stream_readable.js":14,"./lib/_stream_transform.js":15,"./lib/_stream_writable.js":16,"stream":22}],20:[function(require,module,exports){
 module.exports = require("./lib/_stream_transform.js")
 
-},{"./lib/_stream_transform.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_transform.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/writable.js":[function(require,module,exports){
+},{"./lib/_stream_transform.js":15}],21:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_writable.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/stream-browserify/index.js":[function(require,module,exports){
+},{"./lib/_stream_writable.js":16}],22:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4000,7 +4023,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js","inherits":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js","readable-stream/duplex.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/duplex.js","readable-stream/passthrough.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/passthrough.js","readable-stream/readable.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/readable.js","readable-stream/transform.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/transform.js","readable-stream/writable.js":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/writable.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/string_decoder/index.js":[function(require,module,exports){
+},{"events":7,"inherits":8,"readable-stream/duplex.js":11,"readable-stream/passthrough.js":18,"readable-stream/readable.js":19,"readable-stream/transform.js":20,"readable-stream/writable.js":21}],23:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4223,14 +4246,14 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js"}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/util/support/isBufferBrowser.js":[function(require,module,exports){
+},{"buffer":3}],24:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/util/util.js":[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -4820,7 +4843,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/util/support/isBufferBrowser.js","_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","inherits":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js"}],"/Users/alex/things/pm2-plotly/node_modules/JSONStream/index.js":[function(require,module,exports){
+},{"./support/isBuffer":24,"_process":10,"inherits":8}],26:[function(require,module,exports){
 (function (process,Buffer){
 
 
@@ -5017,7 +5040,7 @@ if(!module.parent && process.title !== 'browser') {
 }
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js","jsonparse":"/Users/alex/things/pm2-plotly/node_modules/JSONStream/node_modules/jsonparse/jsonparse.js","through":"/Users/alex/things/pm2-plotly/node_modules/JSONStream/node_modules/through/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/JSONStream/node_modules/jsonparse/jsonparse.js":[function(require,module,exports){
+},{"_process":10,"buffer":3,"jsonparse":27,"through":28}],27:[function(require,module,exports){
 (function (Buffer){
 /*global Buffer*/
 // Named constants with unique integer values
@@ -5422,7 +5445,7 @@ proto.onToken = function (token, value) {
 module.exports = Parser;
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/JSONStream/node_modules/through/index.js":[function(require,module,exports){
+},{"buffer":3}],28:[function(require,module,exports){
 (function (process){
 var Stream = require('stream')
 
@@ -5534,7 +5557,7 @@ function through (write, end, opts) {
 
 
 }).call(this,require('_process'))
-},{"_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","stream":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/stream-browserify/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/ampersand-model.js":[function(require,module,exports){
+},{"_process":10,"stream":22}],29:[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-model"] = window.ampersand["ampersand-model"] || [];  window.ampersand["ampersand-model"].push("5.0.0");}
 var State = require('ampersand-state');
 var _ = require('underscore');
@@ -5668,7 +5691,7 @@ var wrapError = function (model, options) {
 
 module.exports = Model;
 
-},{"ampersand-state":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/ampersand-state.js","ampersand-sync":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/ampersand-sync.js","underscore":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/underscore/underscore.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/ampersand-state.js":[function(require,module,exports){
+},{"ampersand-state":30,"ampersand-sync":35,"underscore":49}],30:[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-state"] = window.ampersand["ampersand-state"] || [];  window.ampersand["ampersand-state"].push("4.4.5");}
 var _ = require('underscore');
 var BBEvents = require('backbone-events-standalone');
@@ -6448,7 +6471,7 @@ Base.extend = extend;
 // Our main exports
 module.exports = Base;
 
-},{"array-next":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/node_modules/array-next/array-next.js","backbone-events-standalone":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/node_modules/backbone-events-standalone/index.js","key-tree-store":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/node_modules/key-tree-store/key-tree-store.js","underscore":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/underscore/underscore.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/node_modules/array-next/array-next.js":[function(require,module,exports){
+},{"array-next":31,"backbone-events-standalone":33,"key-tree-store":34,"underscore":49}],31:[function(require,module,exports){
 module.exports = function arrayNext(array, currentItem) {
     var len = array.length;
     var newIndex = array.indexOf(currentItem) + 1;
@@ -6456,7 +6479,7 @@ module.exports = function arrayNext(array, currentItem) {
     return array[newIndex];
 };
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/node_modules/backbone-events-standalone/backbone-events-standalone.js":[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /**
  * Standalone extraction of Backbone.Events, no external dependency required.
  * Degrades nicely when Backone/underscore are already available in the current
@@ -6724,10 +6747,10 @@ module.exports = function arrayNext(array, currentItem) {
   }
 })(this);
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/node_modules/backbone-events-standalone/index.js":[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 module.exports = require('./backbone-events-standalone');
 
-},{"./backbone-events-standalone":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/node_modules/backbone-events-standalone/backbone-events-standalone.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/node_modules/key-tree-store/key-tree-store.js":[function(require,module,exports){
+},{"./backbone-events-standalone":32}],34:[function(require,module,exports){
 function KeyTreeStore() {
     this.storage = {};
 }
@@ -6768,7 +6791,7 @@ KeyTreeStore.prototype.get = function (keypath) {
 
 module.exports = KeyTreeStore;
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/ampersand-sync.js":[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-sync"] = window.ampersand["ampersand-sync"] || [];  window.ampersand["ampersand-sync"].push("3.0.3");}
 var _ = require('underscore');
 var xhr = require('xhr');
@@ -6896,10 +6919,10 @@ var methodMap = {
     'read':   'GET'
 };
 
-},{"qs":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/index.js","underscore":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js","xhr":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/index.js":[function(require,module,exports){
+},{"qs":36,"underscore":41,"xhr":42}],36:[function(require,module,exports){
 module.exports = require('./lib/');
 
-},{"./lib/":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/index.js":[function(require,module,exports){
+},{"./lib/":37}],37:[function(require,module,exports){
 // Load modules
 
 var Stringify = require('./stringify');
@@ -6916,7 +6939,7 @@ module.exports = {
     parse: Parse
 };
 
-},{"./parse":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/parse.js","./stringify":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/stringify.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/parse.js":[function(require,module,exports){
+},{"./parse":38,"./stringify":39}],38:[function(require,module,exports){
 // Load modules
 
 var Utils = require('./utils');
@@ -7079,7 +7102,7 @@ module.exports = function (str, options) {
     return Utils.compact(obj);
 };
 
-},{"./utils":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/utils.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/stringify.js":[function(require,module,exports){
+},{"./utils":40}],39:[function(require,module,exports){
 // Load modules
 
 var Utils = require('./utils');
@@ -7178,7 +7201,7 @@ module.exports = function (obj, options) {
     return keys.join(delimiter);
 };
 
-},{"./utils":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/utils.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/qs/lib/utils.js":[function(require,module,exports){
+},{"./utils":40}],40:[function(require,module,exports){
 // Load modules
 
 
@@ -7312,7 +7335,7 @@ exports.isBuffer = function (obj) {
         obj.constructor.isBuffer(obj));
 };
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js":[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 //     Underscore.js 1.6.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -8657,7 +8680,7 @@ exports.isBuffer = function (obj) {
   }
 }).call(this);
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/index.js":[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 var window = require("global/window")
 var once = require("once")
 var parseHeaders = require('parse-headers')
@@ -8836,7 +8859,7 @@ function createXHR(options, callback) {
 
 function noop() {}
 
-},{"global/window":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/global/window.js","once":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/once/once.js","parse-headers":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/parse-headers.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/global/window.js":[function(require,module,exports){
+},{"global/window":43,"once":44,"parse-headers":48}],43:[function(require,module,exports){
 (function (global){
 if (typeof window !== "undefined") {
     module.exports = window;
@@ -8849,7 +8872,7 @@ if (typeof window !== "undefined") {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/once/once.js":[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 module.exports = once
 
 once.proto = once(function () {
@@ -8870,7 +8893,7 @@ function once (fn) {
   }
 }
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/index.js":[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 var isFunction = require('is-function')
 
 module.exports = forEach
@@ -8918,7 +8941,7 @@ function forEachObject(object, iterator, context) {
     }
 }
 
-},{"is-function":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/node_modules/is-function/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/node_modules/is-function/index.js":[function(require,module,exports){
+},{"is-function":46}],46:[function(require,module,exports){
 module.exports = isFunction
 
 var toString = Object.prototype.toString
@@ -8935,7 +8958,7 @@ function isFunction (fn) {
       fn === window.prompt))
 };
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/trim/index.js":[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 
 exports = module.exports = trim;
 
@@ -8951,7 +8974,7 @@ exports.right = function(str){
   return str.replace(/\s*$/, '');
 };
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/parse-headers.js":[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 var trim = require('trim')
   , forEach = require('for-each')
   , isArray = function(arg) {
@@ -8983,7 +9006,7 @@ module.exports = function (headers) {
 
   return result
 }
-},{"for-each":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/for-each/index.js","trim":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/xhr/node_modules/parse-headers/node_modules/trim/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/underscore/underscore.js":[function(require,module,exports){
+},{"for-each":45,"trim":47}],49:[function(require,module,exports){
 //     Underscore.js 1.8.2
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -10521,7 +10544,7 @@ module.exports = function (headers) {
   }
 }.call(this));
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/ampersand-view.js":[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-view"] = window.ampersand["ampersand-view"] || [];  window.ampersand["ampersand-view"].push("7.2.0");}
 var State = require('ampersand-state');
 var CollectionView = require('ampersand-collection-view');
@@ -10891,7 +10914,7 @@ _.extend(View.prototype, {
 View.extend = BaseState.extend;
 module.exports = View;
 
-},{"ampersand-collection-view":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-collection-view/ampersand-collection-view.js","ampersand-dom-bindings":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/ampersand-dom-bindings.js","ampersand-state":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-state/ampersand-state.js","domify":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/domify/index.js","events-mixin":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/events-mixin/index.js","get-object-path":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/get-object-path/index.js","matches-selector":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/matches-selector/index.js","underscore":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/underscore/underscore.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-collection-view/ampersand-collection-view.js":[function(require,module,exports){
+},{"ampersand-collection-view":51,"ampersand-dom-bindings":56,"ampersand-state":59,"domify":64,"events-mixin":65,"get-object-path":70,"matches-selector":71,"underscore":72}],51:[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-collection-view"] = window.ampersand["ampersand-collection-view"] || [];  window.ampersand["ampersand-collection-view"].push("1.2.1");}
 var _ = require('underscore');
 var BBEvents = require('backbone-events-standalone');
@@ -11053,7 +11076,7 @@ CollectionView.extend = ampExtend;
 
 module.exports = CollectionView;
 
-},{"ampersand-class-extend":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/ampersand-class-extend/ampersand-class-extend.js","backbone-events-standalone":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/backbone-events-standalone/index.js","underscore":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/underscore/underscore.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/ampersand-class-extend/ampersand-class-extend.js":[function(require,module,exports){
+},{"ampersand-class-extend":52,"backbone-events-standalone":55,"underscore":72}],52:[function(require,module,exports){
 var objectExtend = require('extend-object');
 
 
@@ -11103,7 +11126,7 @@ var extend = function(protoProps) {
 // Expose the extend function
 module.exports = extend;
 
-},{"extend-object":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/ampersand-class-extend/node_modules/extend-object/extend-object.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/ampersand-class-extend/node_modules/extend-object/extend-object.js":[function(require,module,exports){
+},{"extend-object":53}],53:[function(require,module,exports){
 var arr = [];
 var each = arr.forEach;
 var slice = arr.slice;
@@ -11120,7 +11143,7 @@ module.exports = function(obj) {
     return obj;
 };
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/backbone-events-standalone/backbone-events-standalone.js":[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 /**
  * Standalone extraction of Backbone.Events, no external dependency required.
  * Degrades nicely when Backone/underscore are already available in the current
@@ -11398,9 +11421,9 @@ module.exports = function(obj) {
   }
 })(this);
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/backbone-events-standalone/index.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/node_modules/backbone-events-standalone/index.js"][0].apply(exports,arguments)
-},{"./backbone-events-standalone":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/backbone-events-standalone/backbone-events-standalone.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/ampersand-dom-bindings.js":[function(require,module,exports){
+},{}],55:[function(require,module,exports){
+arguments[4][33][0].apply(exports,arguments)
+},{"./backbone-events-standalone":54,"dup":33}],56:[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-dom-bindings"] = window.ampersand["ampersand-dom-bindings"] || [];  window.ampersand["ampersand-dom-bindings"].push("3.3.3");}
 var Store = require('key-tree-store');
 var dom = require('ampersand-dom');
@@ -11594,7 +11617,7 @@ function getBindingFunc(binding, context) {
     }
 }
 
-},{"ampersand-dom":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/node_modules/ampersand-dom/ampersand-dom.js","key-tree-store":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/node_modules/key-tree-store/key-tree-store.js","matches-selector":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/matches-selector/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/node_modules/ampersand-dom/ampersand-dom.js":[function(require,module,exports){
+},{"ampersand-dom":57,"key-tree-store":58,"matches-selector":71}],57:[function(require,module,exports){
 ;if (typeof window !== "undefined") {  window.ampersand = window.ampersand || {};  window.ampersand["ampersand-dom"] = window.ampersand["ampersand-dom"] || [];  window.ampersand["ampersand-dom"].push("1.2.7");}
 var dom = module.exports = {
     text: function (el, val) {
@@ -11714,7 +11737,7 @@ function hide (el) {
     el.style.display = 'none';
 }
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-dom-bindings/node_modules/key-tree-store/key-tree-store.js":[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 var slice = Array.prototype.slice;
 
 // our constructor
@@ -11796,17 +11819,17 @@ KeyTreeStore.prototype.run = function (keypath, context) {
 
 module.exports = KeyTreeStore;
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-state/ampersand-state.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/ampersand-state.js"][0].apply(exports,arguments)
-},{"array-next":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-state/node_modules/array-next/array-next.js","backbone-events-standalone":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-state/node_modules/backbone-events-standalone/index.js","key-tree-store":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-state/node_modules/key-tree-store/key-tree-store.js","underscore":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/underscore/underscore.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-state/node_modules/array-next/array-next.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/node_modules/array-next/array-next.js"][0].apply(exports,arguments)
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-state/node_modules/backbone-events-standalone/backbone-events-standalone.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/node_modules/backbone-events-standalone/backbone-events-standalone.js"][0].apply(exports,arguments)
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-state/node_modules/backbone-events-standalone/index.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-collection-view/node_modules/backbone-events-standalone/index.js"][0].apply(exports,arguments)
-},{"./backbone-events-standalone":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-state/node_modules/backbone-events-standalone/backbone-events-standalone.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/ampersand-state/node_modules/key-tree-store/key-tree-store.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-state/node_modules/key-tree-store/key-tree-store.js"][0].apply(exports,arguments)
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/domify/index.js":[function(require,module,exports){
+},{}],59:[function(require,module,exports){
+arguments[4][30][0].apply(exports,arguments)
+},{"array-next":60,"backbone-events-standalone":62,"dup":30,"key-tree-store":63,"underscore":72}],60:[function(require,module,exports){
+arguments[4][31][0].apply(exports,arguments)
+},{"dup":31}],61:[function(require,module,exports){
+arguments[4][32][0].apply(exports,arguments)
+},{"dup":32}],62:[function(require,module,exports){
+arguments[4][33][0].apply(exports,arguments)
+},{"./backbone-events-standalone":61,"dup":33}],63:[function(require,module,exports){
+arguments[4][34][0].apply(exports,arguments)
+},{"dup":34}],64:[function(require,module,exports){
 
 /**
  * Expose `parse`.
@@ -11916,7 +11939,7 @@ function parse(html, doc) {
   return fragment;
 }
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/events-mixin/index.js":[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -12106,7 +12129,7 @@ function parse(event) {
   }
 }
 
-},{"component-event":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/events-mixin/node_modules/component-event/index.js","delegate-events":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/events-mixin/node_modules/component-event/index.js":[function(require,module,exports){
+},{"component-event":66,"delegate-events":67}],66:[function(require,module,exports){
 var bind = window.addEventListener ? 'addEventListener' : 'attachEvent',
     unbind = window.removeEventListener ? 'removeEventListener' : 'detachEvent',
     prefix = bind !== 'addEventListener' ? 'on' : '';
@@ -12142,7 +12165,7 @@ exports.unbind = function(el, type, fn, capture){
   el[unbind](prefix + type, fn, capture || false);
   return fn;
 };
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/index.js":[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -12194,7 +12217,7 @@ exports.unbind = function(el, type, fn, capture){
   event.unbind(el, type, fn, capture);
 };
 
-},{"closest":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/node_modules/closest/index.js","event":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/events-mixin/node_modules/component-event/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/node_modules/closest/index.js":[function(require,module,exports){
+},{"closest":68,"event":66}],68:[function(require,module,exports){
 var matches = require('matches-selector')
 
 module.exports = function (element, selector, checkYoSelf) {
@@ -12206,7 +12229,7 @@ module.exports = function (element, selector, checkYoSelf) {
   }
 }
 
-},{"matches-selector":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/node_modules/closest/node_modules/matches-selector/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/events-mixin/node_modules/delegate-events/node_modules/closest/node_modules/matches-selector/index.js":[function(require,module,exports){
+},{"matches-selector":69}],69:[function(require,module,exports){
 
 /**
  * Element prototype.
@@ -12247,7 +12270,7 @@ function match(el, selector) {
   }
   return false;
 }
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/get-object-path/index.js":[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 module.exports = get;
 
 function get (context, path) {
@@ -12270,7 +12293,7 @@ function get (context, path) {
   return result;
 }
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/matches-selector/index.js":[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 'use strict';
 
 var proto = Element.prototype;
@@ -12300,9 +12323,9 @@ function match(el, selector) {
   }
   return false;
 }
-},{}],"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/node_modules/underscore/underscore.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/ampersand-model/node_modules/ampersand-sync/node_modules/underscore/underscore.js"][0].apply(exports,arguments)
-},{}],"/Users/alex/things/pm2-plotly/node_modules/emit.io/index.js":[function(require,module,exports){
+},{}],72:[function(require,module,exports){
+arguments[4][41][0].apply(exports,arguments)
+},{"dup":41}],73:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter
 var Through = require('stream').PassThrough
 
@@ -12393,7 +12416,7 @@ module.exports = function () {
   return self
 }
 
-},{"events":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js","stream":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/stream-browserify/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/index.js":[function(require,module,exports){
+},{"events":7,"stream":22}],74:[function(require,module,exports){
 (function (process,Buffer){
 var stream = require('readable-stream')
 var eos = require('end-of-stream')
@@ -12618,7 +12641,7 @@ Duplexify.prototype.end = function(data, enc, cb) {
 
 module.exports = Duplexify
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js","end-of-stream":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/end-of-stream/index.js","readable-stream":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/readable.js","util":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/util/util.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/end-of-stream/index.js":[function(require,module,exports){
+},{"_process":10,"buffer":3,"end-of-stream":75,"readable-stream":86,"util":25}],75:[function(require,module,exports){
 var once = require('once');
 
 var noop = function() {};
@@ -12691,7 +12714,7 @@ var eos = function(stream, opts, callback) {
 };
 
 module.exports = eos;
-},{"once":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/end-of-stream/node_modules/once/once.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/end-of-stream/node_modules/once/node_modules/wrappy/wrappy.js":[function(require,module,exports){
+},{"once":77}],76:[function(require,module,exports){
 // Returns a wrapper function that returns a wrapped callback
 // The wrapper function should do some stuff, and return a
 // presumably different callback function.
@@ -12726,7 +12749,7 @@ function wrappy (fn, cb) {
   }
 }
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/end-of-stream/node_modules/once/once.js":[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 var wrappy = require('wrappy')
 module.exports = wrappy(once)
 
@@ -12749,11 +12772,11 @@ function once (fn) {
   return f
 }
 
-},{"wrappy":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/end-of-stream/node_modules/once/node_modules/wrappy/wrappy.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_duplex.js":[function(require,module,exports){
-arguments[4]["/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_duplex.js"][0].apply(exports,arguments)
-},{"./_stream_readable":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_readable.js","./_stream_writable":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_writable.js","_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","core-util-is":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","inherits":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/inherits/inherits_browser.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_passthrough.js":[function(require,module,exports){
-arguments[4]["/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/lib/_stream_passthrough.js"][0].apply(exports,arguments)
-},{"./_stream_transform":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_transform.js","core-util-is":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","inherits":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/inherits/inherits_browser.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_readable.js":[function(require,module,exports){
+},{"wrappy":76}],78:[function(require,module,exports){
+arguments[4][12][0].apply(exports,arguments)
+},{"./_stream_readable":80,"./_stream_writable":82,"_process":10,"core-util-is":83,"dup":12,"inherits":87}],79:[function(require,module,exports){
+arguments[4][13][0].apply(exports,arguments)
+},{"./_stream_transform":81,"core-util-is":83,"dup":13,"inherits":87}],80:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -13739,7 +13762,7 @@ function indexOf (xs, x) {
 }
 
 }).call(this,require('_process'))
-},{"_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js","core-util-is":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","events":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js","inherits":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/inherits/inherits_browser.js","isarray":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/node_modules/isarray/index.js","stream":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/stream-browserify/index.js","string_decoder/":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/node_modules/string_decoder/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_transform.js":[function(require,module,exports){
+},{"_process":10,"buffer":3,"core-util-is":83,"events":7,"inherits":87,"isarray":84,"stream":22,"string_decoder/":85}],81:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -13951,7 +13974,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_duplex.js","core-util-is":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","inherits":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/inherits/inherits_browser.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_writable.js":[function(require,module,exports){
+},{"./_stream_duplex":78,"core-util-is":83,"inherits":87}],82:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -14341,13 +14364,13 @@ function endWritable(stream, state, cb) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_duplex.js","_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js","core-util-is":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","inherits":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/inherits/inherits_browser.js","stream":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/stream-browserify/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js":[function(require,module,exports){
-arguments[4]["/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js"][0].apply(exports,arguments)
-},{"buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/node_modules/isarray/index.js":[function(require,module,exports){
-arguments[4]["/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/isarray/index.js"][0].apply(exports,arguments)
-},{}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/node_modules/string_decoder/index.js":[function(require,module,exports){
-arguments[4]["/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/string_decoder/index.js"][0].apply(exports,arguments)
-},{"buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/readable.js":[function(require,module,exports){
+},{"./_stream_duplex":78,"_process":10,"buffer":3,"core-util-is":83,"inherits":87,"stream":22}],83:[function(require,module,exports){
+arguments[4][17][0].apply(exports,arguments)
+},{"buffer":3,"dup":17}],84:[function(require,module,exports){
+arguments[4][9][0].apply(exports,arguments)
+},{"dup":9}],85:[function(require,module,exports){
+arguments[4][23][0].apply(exports,arguments)
+},{"buffer":3,"dup":23}],86:[function(require,module,exports){
 var Stream = require('stream'); // hack to fix a circular dependency issue when used with browserify
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = Stream;
@@ -14357,25 +14380,25 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_duplex.js","./lib/_stream_passthrough.js":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_passthrough.js","./lib/_stream_readable.js":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_readable.js","./lib/_stream_transform.js":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_transform.js","./lib/_stream_writable.js":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_writable.js","stream":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/stream-browserify/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/inherits/inherits_browser.js":[function(require,module,exports){
-arguments[4]["/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/inherits/inherits_browser.js"][0].apply(exports,arguments)
-},{}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/lib/_stream_duplex.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_duplex.js"][0].apply(exports,arguments)
-},{"./_stream_readable":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/lib/_stream_readable.js","./_stream_writable":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/lib/_stream_writable.js","_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","core-util-is":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","inherits":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/inherits/inherits_browser.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/lib/_stream_readable.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_readable.js"][0].apply(exports,arguments)
-},{"_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js","core-util-is":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","events":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js","inherits":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/inherits/inherits_browser.js","isarray":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/node_modules/isarray/index.js","stream":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/stream-browserify/index.js","string_decoder/":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/node_modules/string_decoder/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/lib/_stream_transform.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_transform.js"][0].apply(exports,arguments)
-},{"./_stream_duplex":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/lib/_stream_duplex.js","core-util-is":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","inherits":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/inherits/inherits_browser.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/lib/_stream_writable.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/lib/_stream_writable.js"][0].apply(exports,arguments)
-},{"./_stream_duplex":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/lib/_stream_duplex.js","_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js","core-util-is":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/node_modules/core-util-is/lib/util.js","inherits":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/inherits/inherits_browser.js","stream":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/stream-browserify/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/node_modules/core-util-is/lib/util.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/node_modules/core-util-is/lib/util.js"][0].apply(exports,arguments)
-},{"buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/node_modules/isarray/index.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/node_modules/isarray/index.js"][0].apply(exports,arguments)
-},{}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/node_modules/string_decoder/index.js":[function(require,module,exports){
-arguments[4]["/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/node_modules/readable-stream/node_modules/string_decoder/index.js"][0].apply(exports,arguments)
-},{"buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/transform.js":[function(require,module,exports){
-arguments[4]["/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/readable-stream/transform.js"][0].apply(exports,arguments)
-},{"./lib/_stream_transform.js":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/lib/_stream_transform.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/through2.js":[function(require,module,exports){
+},{"./lib/_stream_duplex.js":78,"./lib/_stream_passthrough.js":79,"./lib/_stream_readable.js":80,"./lib/_stream_transform.js":81,"./lib/_stream_writable.js":82,"stream":22}],87:[function(require,module,exports){
+arguments[4][8][0].apply(exports,arguments)
+},{"dup":8}],88:[function(require,module,exports){
+arguments[4][12][0].apply(exports,arguments)
+},{"./_stream_readable":89,"./_stream_writable":91,"_process":10,"core-util-is":92,"dup":12,"inherits":87}],89:[function(require,module,exports){
+arguments[4][80][0].apply(exports,arguments)
+},{"_process":10,"buffer":3,"core-util-is":92,"dup":80,"events":7,"inherits":87,"isarray":93,"stream":22,"string_decoder/":94}],90:[function(require,module,exports){
+arguments[4][81][0].apply(exports,arguments)
+},{"./_stream_duplex":88,"core-util-is":92,"dup":81,"inherits":87}],91:[function(require,module,exports){
+arguments[4][82][0].apply(exports,arguments)
+},{"./_stream_duplex":88,"_process":10,"buffer":3,"core-util-is":92,"dup":82,"inherits":87,"stream":22}],92:[function(require,module,exports){
+arguments[4][17][0].apply(exports,arguments)
+},{"buffer":3,"dup":17}],93:[function(require,module,exports){
+arguments[4][9][0].apply(exports,arguments)
+},{"dup":9}],94:[function(require,module,exports){
+arguments[4][23][0].apply(exports,arguments)
+},{"buffer":3,"dup":23}],95:[function(require,module,exports){
+arguments[4][20][0].apply(exports,arguments)
+},{"./lib/_stream_transform.js":90,"dup":20}],96:[function(require,module,exports){
 (function (process){
 var Transform = require('readable-stream/transform')
   , inherits  = require('util').inherits
@@ -14475,7 +14498,7 @@ module.exports.obj = through2(function (options, transform, flush) {
 })
 
 }).call(this,require('_process'))
-},{"_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","readable-stream/transform":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/node_modules/readable-stream/transform.js","util":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/util/util.js","xtend":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/xtend/immutable.js"}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/xtend/immutable.js":[function(require,module,exports){
+},{"_process":10,"readable-stream/transform":95,"util":25,"xtend":97}],97:[function(require,module,exports){
 module.exports = extend
 
 function extend() {
@@ -14494,7 +14517,7 @@ function extend() {
     return target
 }
 
-},{}],"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/stream.js":[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 (function (process,Buffer){
 var through = require('through2')
 var duplexify = require('duplexify')
@@ -14579,7 +14602,7 @@ function WebSocketStream(target, protocols) {
 }
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/process/browser.js","buffer":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/buffer/index.js","duplexify":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/duplexify/index.js","through2":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/node_modules/through2/through2.js","ws":"/Users/alex/things/pm2-plotly/node_modules/ws/lib/browser.js"}],"/Users/alex/things/pm2-plotly/node_modules/ws/lib/browser.js":[function(require,module,exports){
+},{"_process":10,"buffer":3,"duplexify":74,"through2":96,"ws":99}],99:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -14624,7 +14647,7 @@ function ws(uri, protocols, opts) {
 
 if (WebSocket) ws.prototype = WebSocket.prototype;
 
-},{}],"/Users/alex/things/pm2-plotly/ui/client.js":[function(require,module,exports){
+},{}],100:[function(require,module,exports){
 'use strict';
 
 var emitIO       = require('emit.io')();
@@ -14675,11 +14698,12 @@ controller.on('processList', function (list) {
         proc.pid = proc.pid.toString();
         proc.pm_id = proc.pm_id.toString();
         var contentDiv = document.getElementById('content');
-        console.log(proc);
+
         var processModel = new ProcessModel(proc);
         var processCard = new ProcessCard(controller);
         processCard.model = processModel;
         processCard.render();
+
         contentDiv.appendChild(processCard.el);
         processes.push(processCard);
     });
@@ -14704,12 +14728,12 @@ controller.on('newDashboard', function (spec) {
 
 });
 
-},{"./components/dashboard":"/Users/alex/things/pm2-plotly/ui/components/dashboard.js","./components/headerbar":"/Users/alex/things/pm2-plotly/ui/components/headerbar.js","./components/process-card":"/Users/alex/things/pm2-plotly/ui/components/process-card.js","./models/dashboard":"/Users/alex/things/pm2-plotly/ui/models/dashboard.js","./models/headerbar":"/Users/alex/things/pm2-plotly/ui/models/headerbar.js","./models/process":"/Users/alex/things/pm2-plotly/ui/models/process.js","JSONStream":"/Users/alex/things/pm2-plotly/node_modules/JSONStream/index.js","emit.io":"/Users/alex/things/pm2-plotly/node_modules/emit.io/index.js","events":"/Users/alex/.nvm/v0.10.36/lib/node_modules/watchify/node_modules/browserify/node_modules/events/events.js","websocket-stream":"/Users/alex/things/pm2-plotly/node_modules/websocket-stream/stream.js"}],"/Users/alex/things/pm2-plotly/ui/components/dashboard.js":[function(require,module,exports){
+},{"./components/dashboard":101,"./components/headerbar":102,"./components/process-card":103,"./models/dashboard":104,"./models/headerbar":105,"./models/process":106,"JSONStream":26,"emit.io":73,"events":7,"websocket-stream":98}],101:[function(require,module,exports){
 'use strict';
 
 var AmpersandView = require('ampersand-view');
-
-var template = "<div class=\"\">\n    <div class=\"row\">\n\n        <div class=\"col s2\">\n            <div class=\"card-panel center-align\">\n                <label>processName</label><p data-hook=\"processName\"></p>\n                <label>created</label><p data-hook=\"creationTime\"></p>\n                <label>cpu</label><h4 data-hook=\"cpuUsage\"></h4>\n                <label>freemem</label><h4 data-hook=\"memoryUsage\"></h4>\n\n                <br>\n                <a class=\"waves-effect waves-light btn-floating\">\n                    <i class=\"mdi-navigation-refresh\"></i>\n                </a>\n\n                <a class=\"waves-effect waves-light btn-floating\">\n                    <i class=\"mdi-navigation-close\"></i>\n                </a>\n\n                <a class=\"waves-effect waves-light btn-floating red\">\n                    <i class=\"mdi-action-delete\"></i>\n                </a>\n\n            </div>\n        </div>\n\n        <div class=\"col s10\">\n            <div class=\"card-panel center-align\" id=\"target\">\n            <a data-hook=\"plotlyLink\" target=\"_blank\" style=\"display: block; text-align: center;\">\n                <img data-hook=\"dashboardImage\"/>\n            </a>\n            </div>\n        </div>\n    </div>\n</div>\n";
+var fs = require('fs');
+var template = fs.readFileSync('./ui/templates/dashboard.html', 'utf8');
 
 module.exports = AmpersandView.extend({
     template: template,
@@ -14718,7 +14742,9 @@ module.exports = AmpersandView.extend({
     },
     events: {
         // The event + element: the name of the handler
-        'click .delete': 'handleDeleteClick'
+        'click .delete': 'handleDeleteClick',
+        'click [data-hook=stop]': 'stopProcess',
+        'click [data-hook=restart]': 'restartProcess'
     },
     render: function () {
         var self = this;
@@ -14729,6 +14755,21 @@ module.exports = AmpersandView.extend({
             self.model.memoryUsage = stats.memory || '';
             self.model.creationTime = stats.creationTime;
         });
+    },
+    startProcess: function () {
+        console.log('start');
+        var processName = this.model.processName;
+        this.controller.emit.apply(this.controller, ['start', processName]);
+    },
+    restartProcess: function () {
+        console.log('restarting');
+        var processName = this.model.processName;
+        this.controller.emit.apply(this.controller, ['restart', processName]);
+    },
+    stopProcess: function () {
+        console.log('stoppeing');
+        var processName = this.model.processName;
+        this.controller.emit.apply(this.controller, ['stop', processName]);
     },
     bindings: {
         'model.plotURL': {
@@ -14766,12 +14807,12 @@ module.exports = AmpersandView.extend({
     }
 });
 
-},{"ampersand-view":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/ampersand-view.js"}],"/Users/alex/things/pm2-plotly/ui/components/headerbar.js":[function(require,module,exports){
+},{"ampersand-view":50,"fs":1}],102:[function(require,module,exports){
 'use strict';
 
 var AmpersandView = require('ampersand-view');
-
-var template = "<nav>\n    <div class=\"nav-wrapper\">\n\n        <a class=\"brand-logo center\" href=\"/home\"></a>\n\n        <ul class=\"right\">\n          <li><a href=\"#\" id=\"home\"><i class=\"mdi-action-view-module\"></i></a></li>\n        </ul>\n\n    </div>\n</nav>\n";
+var fs = require('fs');
+var template = fs.readFileSync('./ui/templates/headerbar.html', 'utf8');
 
 module.exports = AmpersandView.extend({
     template: template,
@@ -14793,12 +14834,12 @@ module.exports = AmpersandView.extend({
     }
 });
 
-},{"ampersand-view":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/ampersand-view.js"}],"/Users/alex/things/pm2-plotly/ui/components/process-card.js":[function(require,module,exports){
+},{"ampersand-view":50,"fs":1}],103:[function(require,module,exports){
 'use strict';
 
 var AmpersandView = require('ampersand-view');
-
-var template = "<div class=\"col l4 m4 s6\">\n\n<div class=\"card-panel center-align\">\n    <h5 class=\"blue-text text-darken-2 name\"></h5>\n\n    <table class=\"striped bordered\">\n        <tbody>\n            <tr>\n                <td>pid</td>\n                <td class=\"pid\"></td>\n            </tr>\n            <tr>\n                <td>pm2id</td>\n                <td class=\"pm2id\"></td>\n            </tr>\n            <tr>\n                <td>name</td>\n                <td class=\"name\"></td>\n            </tr>\n        </tbody>\n    </table>\n    <br>\n    <a class=\"waves-effect waves-light btn dashboard\">view Dashboard</a>\n</div>\n\n</div>\n";
+var fs = require('fs');
+var template = fs.readFileSync('./ui/templates/process-card.html', 'utf8');
 
 module.exports = AmpersandView.extend({
     template: template,
@@ -14826,7 +14867,7 @@ module.exports = AmpersandView.extend({
     }
 });
 
-},{"ampersand-view":"/Users/alex/things/pm2-plotly/node_modules/ampersand-view/ampersand-view.js"}],"/Users/alex/things/pm2-plotly/ui/models/dashboard.js":[function(require,module,exports){
+},{"ampersand-view":50,"fs":1}],104:[function(require,module,exports){
 'use strict';
 
 
@@ -14856,7 +14897,7 @@ module.exports = AmpersandModel.extend({
     }
 });
 
-},{"ampersand-model":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/ampersand-model.js"}],"/Users/alex/things/pm2-plotly/ui/models/headerbar.js":[function(require,module,exports){
+},{"ampersand-model":29}],105:[function(require,module,exports){
 'use strict';
 
 
@@ -14871,7 +14912,7 @@ module.exports = AmpersandModel.extend({
     derived: {}
 });
 
-},{"ampersand-model":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/ampersand-model.js"}],"/Users/alex/things/pm2-plotly/ui/models/process.js":[function(require,module,exports){
+},{"ampersand-model":29}],106:[function(require,module,exports){
 'use strict';
 
 
@@ -14888,4 +14929,4 @@ module.exports = AmpersandModel.extend({
     derived: {}
 });
 
-},{"ampersand-model":"/Users/alex/things/pm2-plotly/node_modules/ampersand-model/ampersand-model.js"}]},{},["/Users/alex/things/pm2-plotly/ui/client.js"]);
+},{"ampersand-model":29}]},{},[100]);

@@ -10,6 +10,7 @@
     "JSONStream": "^0.10.0",
     "ampersand-model": "^5.0.0",
     "ampersand-view": "^7.2.0",
+    "chalk": "^1.0.0",
     "ecstatic": "^0.7.0",
     "emit.io": "^0.2.3",
     "hat": "0.0.3",
